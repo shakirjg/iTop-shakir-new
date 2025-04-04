@@ -22,6 +22,7 @@ use utils;
 
 require_once __DIR__ . '/XmlModuleMetaInfo.php';
 require_once __DIR__ . '/XmlModule.php';
+require_once __DIR__ . '/iTopCoreModuleDependency.php';
 
 use ModuleInstallerAPI;
 

@@ -16,13 +16,12 @@
 namespace Combodo\iTop\Test\UnitTest\Integration;
 
 use ApplicationException;
+use Combodo\iTop\Test\UnitTest\iTopCoreModuleDependency;
 use Combodo\iTop\Test\UnitTest\ItopTestCase;
 use Combodo\iTop\Test\UnitTest\XmlModule;
 use Combodo\iTop\Test\UnitTest\XmlModuleMetaInfo;
 use utils;
 
-require_once __DIR__ . '/XmlModuleMetaInfo.php';
-require_once __DIR__ . '/XmlModule.php';
 require_once __DIR__ . '/iTopModulesDependencyValidationService.php';
 
 use ModuleInstallerAPI;
@@ -73,7 +72,7 @@ class iTopModulesDependencyTest extends ItopTestCase {
 				$sXmlUIDs = implode('|', $oXmlModule->aXMlMetaInfosByModuleNames[$sDepModuleName]);
 				$bResolved=false;
 				foreach ($aCurrentDeps as $sDepString){
-					$oModuleDependency = new \iTopCoreModuleDependency($sDepString);
+					$oModuleDependency = new iTopCoreModuleDependency($sDepString);
 
 					if (in_array($sDepModuleName, $oModuleDependency->GetPotentialPrerequisiteModuleNames())) {
 						$bResolved=true;
