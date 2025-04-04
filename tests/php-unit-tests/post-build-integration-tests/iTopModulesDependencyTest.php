@@ -22,7 +22,7 @@ use Combodo\iTop\Test\UnitTest\XmlModule;
 use Combodo\iTop\Test\UnitTest\XmlModuleMetaInfo;
 use utils;
 
-require_once __DIR__ . '/iTopModulesDependencyValidationService.php';
+require_once __DIR__.'/iTopModulesDependencyValidationService.php';
 
 use ModuleInstallerAPI;
 /**
