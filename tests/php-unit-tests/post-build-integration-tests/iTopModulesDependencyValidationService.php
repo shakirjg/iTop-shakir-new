@@ -379,7 +379,7 @@ TXT;
 		$aModuleDepsCount = [];
 		/** @var XmlModule $oXmlModule */
 		foreach ($this->aModules as $oXmlModule) {
-			$aModuleDepsCount[$oXmlModule->sModuleName] = count($oXmlModule->aDependencyModulesNames);
+			$aModuleDepsCount[$oXmlModule->sModuleName] = count($oXmlModule->GetExpandedModuleNames());
 		}
 
 		$aOrderModules=[];
@@ -387,8 +387,14 @@ TXT;
 			asort($aModuleDepsCount);
 
 			foreach ($aModuleDepsCount as $sModuleName => $iCount){
+				//echo "=== OK === $sModuleName\n";
 				if ($iCount>0){
-					throw new \Exception("still deps with $sModuleName");
+					/*foreach ($aModuleDepsCount as $sStillToProcessModuleName => $c) {
+						/** @var XmlModule $oXmlStillToProcessModule */
+						/*$oXmlStillToProcessModule = $this->aModules[$sStillToProcessModuleName];
+						echo "=== NOK ($c)=== $sStillToProcessModuleName: ".$oXmlStillToProcessModule."\n";
+					}*/
+					throw new \Exception("still deps with $sModuleName: ");
 				}
 
 				unset($aModuleDepsCount[$sModuleName]);
@@ -400,7 +406,7 @@ TXT;
 			foreach ($aModuleDepsCount as $sStillToProcessModuleName => $c){
 				/** @var XmlModule $oXmlStillToProcessModule */
 				$oXmlStillToProcessModule = $this->aModules[$sStillToProcessModuleName];
-				if ($oXmlStillToProcessModule->Depends($sModuleName)){
+				if (in_array($sModuleName, $oXmlStillToProcessModule->GetExpandedModuleNames())){
 					$aModuleDepsCount[$sStillToProcessModuleName] = $c - 1 ;
 				}
 			}
@@ -461,10 +467,9 @@ TXT;
 	 *
 	 * @return array: list of fullname classes
 	 */
-	private function ListDeclaredFullnameClassesFromAutoloadFile(string $sPath) : array
+	public function ListDeclaredFullnameClassesFromAutoloadFile(string $sPath) : array
 	{
 		$sAutoloadClassMap = dirname($sPath) . "/composer/autoload_classmap.php";
-		//echo $sAutoloadClassMap . '\n';
 		if (!is_file($sAutoloadClassMap)) {
 			return [];
 		}
@@ -472,17 +477,21 @@ TXT;
 		$sTempfile = tempnam(sys_get_temp_dir(), 'autoload_');
 		$sContent = file_get_contents($sAutoloadClassMap);
 		$sReplace=<<<TXT
+\$vendorDir = 'VENDOR';
+\$baseDir = 'BASEDIR';
 \$aModuleFiles=
 TXT;
 		$sContent = preg_replace('|return|', $sReplace, $sContent);
-		//var_dump($sContent);
 		file_put_contents($sTempfile, $sContent);
 		require_once $sTempfile;
 		@unlink($sTempfile);
 
 		$aRes=[];
-		foreach (array_keys($aModuleFiles) as $sClass){
+		foreach ($aModuleFiles as $sClass => $sClassPath){
 			if (strpos($sClass, 'InstalledVersions')){
+				continue;
+			}
+			if (false !== strpos($sClassPath, 'VENDOR')){
 				continue;
 			}
 			$aRes[]=$sClass;

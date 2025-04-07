@@ -5,6 +5,7 @@ namespace Combodo\iTop\Test\UnitTest;
 class XmlModule {
 	public string $sModuleName;
 	public array $aDependencyModulesNames=[];
+	public array $aExpandedDependencyModulesNames=[];
 	public array $aAllDependencyModulesNames=[];
 	public array $aXMlMetaInfosByModuleNames=[];
 
@@ -82,5 +83,18 @@ class XmlModule {
 		}
 	}
 
+	public function GetExpandedModuleNames() : array {
+		if (count($this->aExpandedDependencyModulesNames) ==0){
+			return $this->aExpandedDependencyModulesNames;
+		}
 
+		$aRes= [];
+		foreach ($this->aDependencyModulesNames as $sDependency){
+			$oiTopCoreModuleDependency = new iTopCoreModuleDependency($sDependency);
+			$aRes = array_merge($aRes, $oiTopCoreModuleDependency->GetPotentialPrerequisiteModuleNames());
+		}
+
+		$this->aExpandedDependencyModulesNames = array_unique($aRes);
+		return $this->aExpandedDependencyModulesNames;
+	}
 }
