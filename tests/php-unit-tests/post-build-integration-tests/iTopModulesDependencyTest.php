@@ -64,6 +64,7 @@ class iTopModulesDependencyTest extends ItopTestCase {
 	 */
 	public function testModulesBasedOnDMFilesOnly()
 	{
+		$this->markTestSkipped("testReadModuleFileData covers this validation");
 		iTopModulesDependencyValidationService::GetInstance()->FetchAllDependenciesViaDM();
 
 		$aErrors=[];
