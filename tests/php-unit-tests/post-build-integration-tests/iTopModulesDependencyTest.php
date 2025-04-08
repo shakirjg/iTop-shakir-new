@@ -56,15 +56,7 @@ class iTopModulesDependencyTest extends ItopTestCase {
 	public function testReadModuleFileData()
 	{
 		iTopModulesDependencyValidationService::GetInstance()->FetchAllDependenciesViaModulesFiles();
-		$this->testModulesBasedOnDMFilesOnly();
-	}
 
-	/**
-	 * Module dependency validation: make sure dependencies are correct toward classes/interfaces coming from Xml datamodel files
-	 */
-	public function testModulesBasedOnDMFilesOnly()
-	{
-		$this->markTestSkipped("testReadModuleFileData covers this validation");
 		iTopModulesDependencyValidationService::GetInstance()->FetchAllDependenciesViaDM();
 
 		$aErrors=[];
@@ -81,6 +73,21 @@ class iTopModulesDependencyTest extends ItopTestCase {
 					if (in_array($sDepModuleName, $oModuleDependency->GetPotentialPrerequisiteModuleNames())) {
 						$bResolved=true;
 						break;
+					}
+
+					if (false !== strpos($sDepModuleName, '|')){
+						$aDepModules = explode('|', $sDepModuleName);
+						foreach ($aDepModules as $sDepModule){
+							$sDepModule = trim($sDepModule);
+							if (in_array($sDepModule, $oModuleDependency->GetPotentialPrerequisiteModuleNames())) {
+								$bResolved=true;
+								break;
+							}
+						}
+
+						if ($bResolved){
+							break;
+						}
 					}
 
 					foreach ($oModuleDependency->GetPotentialPrerequisiteModuleNames() as $sPotentialDepModuleName){
